@@ -1,0 +1,82 @@
+example:
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar); 
+table MediaType(MediaTypeSchema);
+
+query q1                -- define query q1 
+`SELECT a.Name FROM MediaType a`;
+
+query q2                -- define query q1 
+`select a.Name FrOm MediaType a`;
+
+verify q1 q2;           -- does q1 equal to q2?
+
+##### schemas/tables
+
+## Album
+
+schema AlbumSchema(AlbumId: int, Title: varchar, ArtistId: int); 
+table Album(AlbumSchema);
+
+## Artist
+
+schema ArtistSchema(ArtistId: int, Name: varchar); 
+table Artist(ArtistSchema);
+
+## Customer
+
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
+
+## Employee
+
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+## Genre
+
+schema GenreSchema(GenreId: int, Name: varchar); 
+table Genre(GenreSchema);
+
+## Invoice
+
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+## InvoiceLine
+
+schema InvoiceLineSchema(InvoiceLineId: int, InvoiceId: int, TrackId: int,
+			UnitPrice: numeric, Quantity: int); 
+table InvoiceLine(InvoiceLineSchema);
+
+## MediaType
+
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar); 
+table MediaType(MediaTypeSchema);
+
+## Playlist
+
+schema PlaylistSchema(PlaylistId: int, Name: varchar); 
+table Playlist(PlaylistSchema);
+
+## PlaylistTrack
+
+schema PlaylistTrackSchema(PlaylistId: int, TrackId: int); 
+table PlaylistTrack(PlaylistTrackSchema);
+
+## Track
+
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+		MediaTypeId: int, GenreId: int, Composer: varchar,
+		Milliseconds: int, Bytes: int, UnitPrice: numeric); 
+table Track(TrackSchema);
+
