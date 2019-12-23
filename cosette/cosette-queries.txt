@@ -1,0 +1,322 @@
+# 1
+
+schema AlbumSchema(AlbumId: int, Title: varchar, ArtistId: int); 
+table Album(AlbumSchema);
+
+query q1                 
+`select * from Album b`;
+
+query q2                
+`select a.AlbumId, a.Title, a.ArtistId from Album a`;
+
+verify q1 q2;
+
+# 2 #########################################################################################
+
+schema AlbumSchema(AlbumId: int, Title: varchar, ArtistId: int); 
+table Album(AlbumSchema);
+
+query q2                 
+`select * from Album b`;
+
+query q1                
+`select a.AlbumId, a.Title, a.ArtistId from Album a`;
+
+verify q1 q2;
+
+# 3 #########################################################################################
+`schema PlaylistTrackSchema(PlaylistId: int, TrackId: int);
+table PlaylistTrack(PlaylistTrackSchema);
+
+query q1 -- define query q1
+`SELECT a.TrackId FROM PlaylistTrack a WHERE TrackId < 100`;
+
+query q2 -- define query q1
+`SELECT a.TrackId FROM PlaylistTrack a WHERE NOT (a.TrackId > 99)`;
+
+verify q1 q2; -- does q1 equal to q2?`
+
+# 4 #########################################################################################
+
+schema GenreSchema(GenreId: int, Name: varchar);
+table Genre(GenreSchema);
+
+query q1
+`SELECT g.Name FROM Genre g`; -- `SELECT g.Name FROM Genre g;`; auch nicht mgl.
+
+query q2
+`SELECT g.Name FROM Genre g`
+
+verify q1 q2;
+
+# 5 #########################################################################################
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar); 
+table MediaType(MediaTypeSchema);
+
+query q1
+`SELECT mt.Name FROM MediaType mt`;
+
+query q2
+`select mt.Name FrOm MediaType mt`;
+
+verify q1 q2;
+
+# 6 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.InvoiceDate, i.BillingAddress, i.BillingCity FROM Invoice i`;
+
+query q2
+`SELECT i.BillingAddress, i.BillingCity FROM Invoice i`;
+
+verify q1 q2;
+
+# 7 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.BillingAddress, i.BillingCity FROM Invoice i`;
+
+query q2
+`SELECT i.InvoiceDate, i.BillingAddress, i.BillingCity FROM Invoice i`;
+
+verify q1 q2;
+
+# 8 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.BillingAddress, i.BillingCity FROM Invoice i`;
+
+query q2
+`SELECT i.BillingCity, i.BillingAddress  FROM Invoice i`;
+
+verify q1 q2;
+
+# 9 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+
+query q1
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr ORDER BY tr.GenreId ASC`;
+
+query q2
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr ORDER BY tr.GenreId `;
+
+verify q1 q2;
+
+# 10 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+
+query q1
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr ORDER BY tr.GenreId DESC`;
+
+query q2
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr`;
+
+verify q1 q2;
+
+# 11 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+
+query q1
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr ORDER BY tr.GenreId DESC`;
+
+query q2
+`SELECT tr.TrackId, tr.Name, tr.GenreId from Track tr ORDER BY GenreId ASC`;
+
+verify q1 q2;
+
+# 12 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+
+query q1
+`SELECT tr.Name, tr.MediaTypeId FROM Track tr WHERE tr.MediaTypeId > 2`;
+
+query q2
+`SELECT tr.Name, tr.MediaTypeId FROM Track tr WHERE tr.MediaTypeId > 2 and tr.MediaTypeId > 1`;
+
+verify q1 q2;
+
+# 13 #########################################################################################
+
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+
+query q1
+`SELECT tr.Name, tr.MediaTypeId FROM Track tr WHERE tr.MediaTypeId > 2`;
+
+query q2
+`SELECT tr.Name, tr.MediaTypeId FROM Track tr
+	WHERE tr.MediaTypeId > 2 or tr.MediaTypeId > 1`;
+
+verify q1 q2;
+
+# 14 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar); 
+table MediaType(MediaTypeSchema);
+
+query q1
+`
+select tr.TrackId, tr.Name, tr.Composer from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt where mt.Name = 'AAC audio file')
+as t_MediaType ON tr.MediaTypeId = t_MediaType.MediaTypeId`;
+
+query q2
+`
+select tr.TrackId, tr.Name, Trtrack.Composer  from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt)
+as t_MediaType ON tr.MediaTypeId = t_MediaType.MediaTypeId`;
+
+verify q1 q2;
+
+# 15 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar); 
+table MediaType(MediaTypeSchema);
+
+query q1
+`
+select tr.TrackId, tr.Name, tr.Composer from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt where mt.Name = 'AAC audio file')
+as t_MediaType ON tr.MediaTypeId = t_MediaType.MediaTypeId`;
+
+query q2
+`select tr.TrackId, tr.Name, tr.Composer  from Track  tr
+Join MediaType mt ON tr.MediaTypeId = mt.MediaTypeId`;
+
+verify q1 q2;
+
+# 16 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar);
+table MediaType(MediaTypeSchema);
+
+query q1
+`select tr.TrackId, tr.Name, tr.Composer from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt where mt.Name = 'AAC audio file')
+as tMediaType ON tr.MediaTypeId = tMediaType.MediaTypeId`;
+
+query q2
+`select tr.TrackId, tr.Name, tr.Composer from Track tr
+join MediaType mt
+ON tr.MediaTypeId = mt.MediaTypeId
+WHERE mt.Name = 'AAC audio file'`;
+
+verify q1 q2;
+
+# 17 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar);
+table MediaType(MediaTypeSchema);
+
+query q1
+`select tr.TrackId, tr.Name, tr.Composer from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt where mt.Name = 'AAC audio file')
+as tMediaType ON tr.MediaTypeId = tMediaType.MediaTypeId`;
+
+query q2
+`select tr.TrackId, tr.Name, tr.Composer from Track tr
+join MediaType mt
+ON tr.MediaTypeId = mt.MediaTypeId
+AND mt.Name = 'AAC audio file'`;
+
+verify q1 q2;
+
+# 18 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema MediaTypeSchema(MediaTypeId: int, Name: varchar);
+table MediaType(MediaTypeSchema);
+
+query q1
+`select tr.TrackId, tr.Name, tr.Composer from Track tr
+join (select mt.MediaTypeId,  mt.Name from MediaType mt where mt.Name = 'AAC audio file')
+as tMediaType ON tr.MediaTypeId = tMediaType.MediaTypeId`;
+
+query q2
+`select tr.TrackId, tr.Name, tr.Composer
+from Track tr, MediaType mt
+where
+tr.MediaTypeId = mt.MediaTypeId
+and 
+(mt.Name = 'AAC audio file')`;
+
+verify q1 q2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
