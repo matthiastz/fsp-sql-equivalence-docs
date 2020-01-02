@@ -285,38 +285,690 @@ and
 
 verify q1 q2;
 
+# 19 #########################################################################################
+schema PlaylistTrackSchema(PlaylistId: int, TrackId: int); 
+table PlaylistTrack(PlaylistTrackSchema);
+
+query q1
+`SELECT DISTINCT pt.PlaylistId FROM PlaylistTrack pt`;
+
+query q2
+`SELECT pt.PlaylistId FROM PlaylistTrack pt`;
+
+verify q1 q2;
+
+# 20 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT * FROM Employee e
+WHERE e.Title = 'Sales Support Agent'`;
+
+query q2
+`SELECT * FROM Employee e`;
+
+verify q1 q2;
+
+# 21 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT * FROM Employee e
+WHERE e.Title = 'Sales Support Agent'`;
+
+query q2
+`SELECT * FROM Employee e
+WHERE e.ReportsTo = 2`;
+
+verify q1 q2;
+
+# 22 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.Email FROM Employee e
+WHERE e.City = 'Calgary' AND e.ReportsTo = 1`;
+
+query q2
+`SELECT e.Email FROM Employee e
+WHERE e.City = 'Calgary'`;
+
+verify q1 q2;
+
+# 23 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE e.City = 'Edmonton' OR e.City  = 'Lethbridge'`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE e.City = 'Edmonton'`;
+
+verify q1 q2;
+
+# 24 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE e.City = 'Edmonton' OR e.City  = 'Lethbridge'`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE e.City = 'Edmonton' OR e.City = 'Calgary'`;
+
+verify q1 q2;
+
+# 25 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE NOT e.City = 'Calgary'`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE e.City = 'Lethbridge' OR e.City = 'Edmonton'`;
+
+verify q1 q2;
+
+# 26 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE NOT e.City = 'Calgary'`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+WHERE NOT e.City = 'Edmonton'`;
+
+verify q1 q2;
+
+# 27 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+LIMIT 3`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+LIMIT 4`;
+
+verify q1 q2;
+
+# 28 #########################################################################################
+schema EmployeeSchema(EmployeeId: int, LastName: varchar, FirstName: varchar,
+		Title: varchar, ReportsTo: int,
+		BirthDate: date, HireDate: date, Address: varchar, 
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar); 
+table Employee(EmployeeSchema);
+
+query q1
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e
+LIMIT 3`;
+
+query q2
+`SELECT e.LastName, e.FirstName, e.City FROM Employee e`;
+
+verify q1 q2;
+
+# 29 #########################################################################################
+schema InvoiceLineSchema(InvoiceLineId: int, InvoiceId: int, TrackId: int,
+			UnitPrice: numeric, Quantity: int); 
+table InvoiceLine(InvoiceLineSchema);
+
+query q1
+`SELECT MIN(il.UnitPrice) FROM InvoiceLine il`;
+
+query q2
+`SELECT il.UnitPrice FROM InvoiceLine il LIMIT 1`;
+
+verify q1 q2;
+
+# 30 #########################################################################################
+schema InvoiceLineSchema(InvoiceLineId: int, InvoiceId: int, TrackId: int,
+			UnitPrice: numeric, Quantity: int); 
+table InvoiceLine(InvoiceLineSchema);
+
+query q1
+`SELECT MIN(il.UnitPrice) FROM InvoiceLine il`;
+
+query q2
+`SELECT MAX(il.UnitPrice) FROM InvoiceLine il`;
+
+verify q1 q2;
+
+# 31 #########################################################################################
+schema InvoiceLineSchema(InvoiceLineId: int, InvoiceId: int, TrackId: int,
+			UnitPrice: numeric, Quantity: int); 
+table InvoiceLine(InvoiceLineSchema);
+
+query q1
+`SELECT MAX(il.UnitPrice) FROM InvoiceLine il`;
+
+query q2
+`SELECT il.UnitPrice FROM InvoiceLine il LIMIT 1`;
+
+verify q1 q2;
+
+# 32 #########################################################################################
+schema InvoiceLineSchema(InvoiceLineId: int, InvoiceId: int, TrackId: int,
+			UnitPrice: numeric, Quantity: int); 
+table InvoiceLine(InvoiceLineSchema);
+
+query q1
+`SELECT COUNT(il.UnitPrice) FROM InvoiceLine il WHERE il.UnitPrice = 0.99`;
+
+query q2
+`SELECT il.UnitPrice FROM InvoiceLine il WHERE il.UnitPrice = 0.99`;
+
+verify q1 q2;
 
 
+# 33 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT avg(i.Total) FROM Invoice i`;
+
+query q2
+`SELECT i.Total FROM Invoice i`;
+
+verify q1 q2;
+
+# 34 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT sum(i.Total) FROM Invoice i`;
+
+query q2
+`SELECT i.Total FROM Invoice i`;
+
+verify q1 q2;
+
+# 35 #########################################################################################
+schema ArtistSchema(ArtistId: int, Name: varchar); 
+table Artist(ArtistSchema);
+
+query q1
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE '%Metal%'`;
+
+query q2
+`SELECT a.ArtistId, a.Name FROM Artist a`;
+
+verify q1 q2;
+
+# 36 #########################################################################################
+schema ArtistSchema(ArtistId: int, Name: varchar); 
+table Artist(ArtistSchema);
+
+query q1
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE 'Sant%'`;
+
+query q2
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE 'San%'`;
+
+verify q1 q2;
+
+# 37 #########################################################################################
+schema ArtistSchema(ArtistId: int, Name: varchar); 
+table Artist(ArtistSchema);
+
+query q1
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE 'M%o'`;
+
+query q2
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE 'M%'`;
+
+verify q1 q2;
+
+# 38 #########################################################################################
+schema ArtistSchema(ArtistId: int, Name: varchar); 
+table Artist(ArtistSchema);
+
+query q1
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE '_ %'`;
+
+query q2
+`SELECT a.ArtistId, a.Name FROM Artist a WHERE a.Name LIKE '_%'`;
+
+verify q1 q2;
 
 
+# 39 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
 
+query q1
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i
+WHERE i.BillingCountry IN ('USA', 'Canada', 'Brazil')`;
 
+query q2
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i`;
 
+verify q1 q2;
 
+# 40 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
 
+query q1
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i
+WHERE i.BillingCountry IN ('USA', 'Canada', 'Brazil')`;
 
+query q2
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i
+WHERE i.BillingCountry IN ('USA', 'Brazil')`;
 
+verify q1 q2;
 
+# 41 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
 
+query q1
+`SELECT i.InvoiceId, i.InvoiceDate, i,BillingCountry FROM Invoice i
+WHERE i.InvoiceDate between '2012-06-04 00:00:00' AND '2012-07-28 00:00:00'`;
 
+query q2
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i`;
 
+verify q1 q2;
 
+# 42 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
 
+query q1
+`SELECT i.InvoiceId, i.InvoiceDate, i,BillingCountry FROM Invoice i
+WHERE i.InvoiceDate between '2012-06-04 00:00:00' AND '2012-07-28 00:00:00'`;
 
+query q2
+`SELECT i.InvoiceId, i.InvoiceDate, i.BillingCountry FROM Invoice i
+WHERE i.InvoiceDate between '2012-05-04 00:00:00' AND '2012-07-28 00:00:00'`;
 
+verify q1 q2;
 
+# 43 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
 
+query q1
+`SELECT i.InvoiceId, i.CustomerId FROM Invoice i
+WHERE i.InvoiceId between 50 AND 100`;
 
+query q2
+`SELECT i.InvoiceId, i.CustomerId FROM Invoice i
+WHERE i.InvoiceId between 0 AND 120`;
 
+verify q1 q2;
 
+# 44 #########################################################################################
+schema GenreSchema(GenreId: int, Name: varchar); 
+table Genre(GenreSchema);
 
+query q1
+`SELECT g.Name AS Genres FROM Genre g`;
 
+query q2
+`SELECT g.Name AS Genre FROM Genre g`;
 
+verify q1 q2;
 
+# 45 #########################################################################################
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
 
+query q1
+`SELECT c.City FROM Customer c
+UNION 
+SELECT e.City FROM Employee e`;
 
+query q2
+`SELECT c.City FROM Customer c`;
 
+verify q1 q2;
 
+# 46 #########################################################################################
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
 
+query q1
+`SELECT c.City FROM Customer c
+UNION 
+SELECT e.City FROM Employee e`;
 
+query q2
+`SELECT c.City FROM Customer c
+UNION 
+SELECT i.BillingCity FROM Invoice i`;
 
+verify q1 q2;
+
+# 47 #########################################################################################
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
+
+query q1
+`SELECT c.City FROM Customer c
+UNION ALL
+SELECT e.City FROM Employee e`;
+
+query q2
+`SELECT c.City FROM Customer c
+UNION 
+SELECT e.City FROM Employee e`;
+
+verify q1 q2;
+
+# 48 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.InvoiceId, i.CustomerId, count(i.CustomerId) FROM Invoice i
+GROUP BY i.CustomerId`;
+
+query q2
+`SELECT i.InvoiceId, i.CustomerId, count(i.CustomerId) FROM Invoice i`;
+
+verify q1 q2;
+
+# 49 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.InvoiceId, i.CustomerId, count(i.CustomerId) FROM Invoice i
+GROUP BY i.CustomerId`;
+
+query q2
+`SELECT i.InvoiceId, i.CustomerId, count(i.CustomerId) FROM Invoice i
+GROUP BY i.InvoiceId`;
+
+verify q1 q2;
+
+# 50 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.CustomerId, count(i.CustomerId) FROM Invoice i
+group by i.CustomerId
+having count(i.CustomerId) < 7`;
+
+query q2
+`SELECT i.CustomerId, count(i.CustomerId) FROM Invoice i
+group by i.CustomerId`;
+
+verify q1 q2;
+
+# 51 #########################################################################################
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT i.CustomerId, count(i.CustomerId) FROM Invoice i
+group by i.CustomerId
+having count(i.CustomerId) < 7`;
+
+query q2
+`SELECT i.CustomerId, count(i.CustomerId) FROM Invoice i
+group by i.CustomerId
+having count(i.CustomerId) > 1`;
+
+verify q1 q2;
+
+# 52 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+		MediaTypeId: int, GenreId: int, Composer: varchar,
+		Milliseconds: int, Bytes: int, UnitPrice: numeric); 
+table Track(TrackSchema);
+schema GenreSchema(GenreId: int, Name: varchar); 
+table Genre(GenreSchema);
+
+query q1
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t
+WHERE EXISTS
+(SELECT g.GenreId FROM Genre g WHERE t.GenreId = g.GenreId AND (g.Name = 'Reggae' OR g.Name = 'Jazz'))`;
+
+query q2
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t
+WHERE EXISTS
+(SELECT g.GenreId FROM Genre g WHERE t.GenreId = g.GenreId AND g.Name = 'Reggae' OR g.Name = 'Jazz')`;
+
+verify q1 q2;
+
+# 53 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+		MediaTypeId: int, GenreId: int, Composer: varchar,
+		Milliseconds: int, Bytes: int, UnitPrice: numeric); 
+table Track(TrackSchema);
+schema GenreSchema(GenreId: int, Name: varchar); 
+table Genre(GenreSchema);
+
+query q1
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t
+WHERE EXISTS
+(SELECT g.GenreId FROM Genre g WHERE t.GenreId = g.GenreId AND (g.Name = 'Reggae' OR g.Name = 'Jazz'))`;
+
+query q2
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t`;
+
+verify q1 q2;
+
+# 54 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+		MediaTypeId: int, GenreId: int, Composer: varchar,
+		Milliseconds: int, Bytes: int, UnitPrice: numeric); 
+table Track(TrackSchema);
+schema GenreSchema(GenreId: int, Name: varchar); 
+table Genre(GenreSchema);
+
+query q1
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t
+WHERE EXISTS
+(SELECT g.GenreId FROM Genre g WHERE t.GenreId = g.GenreId AND (g.Name = 'Reggae' OR g.Name = 'Jazz'))`;
+
+query q2
+`SELECT t.TrackId, t.Name, t.GenreId 
+FROM Track t
+WHERE t.GenreID IN
+(SELECT g.GenreID FROM Genre g WHERE t.GenreId = g.GenreId AND (g.Name = 'Reggae' OR g.Name = 'Jazz'));`;
+
+verify q1 q2;
+
+# 55 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema PlaylistTrackSchema(PlaylistId: int, TrackId: int);
+table PlaylistTrack(PlaylistTrackSchema);
+schema GenreSchema(GenreId: int, Name: varchar);
+table Genre(GenreSchema);
+
+query q1
+`SELECT PT.PlaylistId, TR.TrackId, TR.Name, G.Name FROM
+PlaylistTrack AS PT INNER JOIN Track AS TR ON TR.TrackId = PT.TrackId
+  INNER JOIN
+  Genre AS G ON G.GenreId = TR.GenreId`;
+
+query q2
+`SELECT PT.PlaylistId, TR.TrackId, TR.Name, G.Name FROM
+PlaylistTrack AS PT JOIN Track AS TR ON PT.TrackId = TR.TrackId
+  INNER JOIN
+  Genre AS G ON TR.GenreId = G.GenreId`;
+
+verify q1 q2;
+
+# 56 #########################################################################################
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT c.CustomerId, i.InvoiceId
+FROM Customer AS c LEFT JOIN Invoice AS i
+ON c.CustomerId = i.InvoiceId`;
+
+query q2
+`SELECT c.CustomerId, i.InvoiceId
+FROM Customer AS c LEFT OUTER JOIN Invoice AS i
+ON c.CustomerId = i.InvoiceId`;
+
+verify q1 q2;
+
+# 57 #########################################################################################
+schema CustomerSchema(CustomerId: int, FirstName: varchar,
+		LastName: varchar, Company: varchar, Address: varchar,
+		City: varchar, State: varchar, Country: varchar, PostalCode: varchar,
+		Phone: varchar, Fax: varchar, Email: varchar, SupportRepId: int); 
+table Customer(CustomerSchema);
+schema InvoiceSchema(InvoiceId: int, CustomerId: int, InvoiceDate: date,
+			BillingAddress: varchar, BillingCity: varchar,
+			BillingState: varchar, BillingCountry: varchar,
+			BillingPostalCode: varchar, Total: numeric); 
+table Invoice(InvoiceSchema);
+
+query q1
+`SELECT A.FirstName AS CustomerName1, B.FirstName AS CustomerName2, A.City
+FROM Customer AS A, Customer AS B
+WHERE NOT A.CustomerID = B.CustomerID
+AND A.City = B.City 
+ORDER BY A.City`;
+
+query q2
+`SELECT X.FirstName AS CustomerName1, Y.FirstName AS CustomerName2, Y.City
+FROM Customer AS X, Customer AS Y
+WHERE NOT Y.CustomerID = X.CustomerID
+AND X.City = Y.City 
+ORDER BY Y.City`;
+
+verify q1 q2;
+
+# 58 #########################################################################################
+schema TrackSchema(TrackId: int, Name: varchar, AlbumId: int,
+                MediaTypeId: int, GenreId: int, Composer: varchar,
+                Milliseconds: int, Bytes: int, UnitPrice: numeric);
+table Track(TrackSchema);
+schema PlaylistTrackSchema(PlaylistId: int, TrackId: int);
+table PlaylistTrack(PlaylistTrackSchema);
+schema GenreSchema(GenreId: int, Name: varchar);
+table Genre(GenreSchema);
+
+query q1
+`SELECT PT.PlaylistId, T.TrackId, T.Name FROM 
+PlaylistTrack AS PT INNER JOIN Track AS T ON PT.TrackId = T.TrackId
+`;
+
+query q2
+`SELECT PT.PlaylistId, T.TrackId, T.Name, G.Name FROM 
+PlaylistTrack AS PT INNER JOIN Track AS T ON PT.TrackId = T.TrackId
+  INNER join
+  Genre AS G ON G.GenreId = T.GenreId
+`;
+
+verify q1 q2;
