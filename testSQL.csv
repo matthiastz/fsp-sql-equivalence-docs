@@ -1,0 +1,188 @@
+,,Hinweise,,,,,,
+,,"Ergebnis (0: nicht äquivalent, 1: äquivalent, (pm=0..1): tw. Äquivalent, error: Fehler → System kann Querys nicht vergleichen)",,,,,,
+,,pm = partial marking (z.B. zu 85% korrekt),,,,,,
+,,"pm, sonst 0 → falls Verfahren partielle Bewertung unterstützt wird pm erwartet, ansonsten nicht äquivalent erwartet",,,,,,
+,,,,,,,,
+,,"Name = testSQL, pm = false",,,,tats. = tatsächlich,,
+,,,,,,,,
+,,,,Ergebnis,,,,
+Mutations-Kategorie/SQL-Feature,Nr.,Query (Musterlösung),Test-Query (Kandidat),erwartet,tats.,Anmerkung,Compare,
+columns select vs. Select *,1,SELECT * FROM Album;,"SELECT AlbumId, Title, ArtistId FROM Album;",1,1,,0,
+,2,"SELECT AlbumId, Title, ArtistId FROM Album;",SELECT * FROM Album;,1,1,,0,
+"where: same semantic, minimal syntax change",3,"SELECT TrackId FROM PlaylistTrack 
+WHERE TrackId < 100;","SELECT TrackId FROM PlaylistTrack 
+WHERE TrackId <= 99;",1,1,,0,
+Semicolon ;,4,SELECT Name FROM Genre;,SELECT Name FROM Genre,1,1,,0,
+"syntax sql keywords (upper, lower case)",5,SELECT Name FROM MediaType;,select Name FrOm MediaType;,1,1,,0,
+column count differing,6,"SELECT InvoiceDate, BillingAddress, BillingCity FROM Invoice;","SELECT BillingAddress, BillingCity FROM Invoice;",0,0,"Expected only the following column(s) to be selected: InvoiceDate, BillingAddress, BillingCity!",0,
+,7,"SELECT BillingAddress, BillingCity FROM Invoice;","SELECT InvoiceDate, BillingAddress, BillingCity FROM Invoice;",0,0,"Expected only the following column(s) to be selected: BillingAddress, BillingCity!",0,
+column ordering,8,,"SELECT BillingCity, BillingAddress  FROM Invoice;",0,1,tatsächlich inkorrekt? Reihenfolge Columns. Mail nachfragen?,1,
+order by,9,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId ASC;","SELECT TrackId, Name, GenreId from Track ORDER BY GenreId;",1,1,,0,
+,10,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId DESC;","SELECT TrackId, Name, GenreId from Track;",0,1,order by wird nicht ausreichend behandelt!,1,
+,11,,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId ASC;",0,1,order by wird nicht ausreichend behandelt!,1,
+Redundanzen,12,"SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2;
+","SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2 and MediaTypeId > 1;",1,1,,0,
+,13,,"SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2 or MediaTypeId > 1;
+",0,0,"Expected a total of 232 row(s) to be returned, instead got 469!",0,
+Sub-Query/Join,14,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join (select MediaType.MediaTypeId,  MediaType.Name from MediaType where MediaType.Name = 'AAC audio file')
+as t_MediaType ON Track.MediaTypeId = t_MediaType.MediaTypeId;","select Track.TrackId, Track.Name, Track.Composer   from Track 
+join (select MediaType.MediaTypeId,  MediaType.Name from MediaType)
+as t_MediaType ON Track.MediaTypeId = t_MediaType.MediaTypeId;
+",0,0,"Expected a total of 11 row(s) to be returned, instead got 3503!",0,
+,15,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+Join MediaType ON Track.MediaTypeId = MediaType.MediaTypeId;
+
+",0,0,"Expected a total of 11 row(s) to be returned, instead got 3503!",0,
+,16,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join MediaType
+ON Track.MediaTypeId = MediaType.MediaTypeId
+WHERE MediaType.Name = 'AAC audio file';
+
+",1,1,,0,
+,17,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join MediaType
+ON Track.MediaTypeId = MediaType.MediaTypeId
+AND MediaType.Name = 'AAC audio file';
+
+
+",1,1,,0,
+,18,,"select Track.TrackId, Track.Name, Track.Composer
+from Track, MediaType
+where
+Track.MediaTypeId = MediaType.MediaTypeId
+and 
+(MediaType.Name = 'AAC audio file')",1,1,,0,
+distinct,19,SELECT DISTINCT PlaylistId FROM PlaylistTrack;,SELECT  PlaylistId FROM PlaylistTrack;,0,0,"Expected a total of 14 row(s) to be returned, instead got 8715!",0,
+"where, and",20,"SELECT * FROM Employee
+WHERE Title = 'Sales Support Agent';",SELECT * FROM Employee;,0,0,keine Where-Klausel,0,
+,21,,"SELECT * FROM Employee
+WHERE ReportsTo = 2;
+
+",0,1,zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik,1,
+,22,"SELECT Email FROM Employee
+WHERE City = 'Calgary' AND ReportsTo = 1;
+","SELECT Email FROM Employee
+WHERE City = 'Calgary';
+",0,0,"Expected a total of 2 row(s) to be returned, instead got 5!",0,
+or,23,"SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton' OR City  = 'Lethbridge';","SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton';",0,0,"Expected a total of 3 row(s) to be returned, instead got 1!",0,
+,24,,"SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton' OR City = 'Calgary';",0,0,"Expected a total of 3 row(s) to be returned, instead got 6!",0,
+not,25,"SELECT LastName, FirstName, City FROM Employee
+WHERE NOT City = 'Calgary';","SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Lethbridge' OR City = 'Edmonton';",0,1,zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik → Test für Verfahren mit pragmatischen Ansatz,1,
+,26,,"SELECT LastName, FirstName, City FROM Employee
+WHERE NOT City = 'Edmonton';",0,0,"Expected a total of 3 row(s) to be returned, instead got 7!",0,
+limit,27,"SELECT LastName, FirstName, City FROM Employee
+LIMIT 3;","SELECT LastName, FirstName, City FROM Employee
+LIMIT 4;
+",0,0,"Expected a total of 3 row(s) to be returned, instead got 4!",0,
+,28,,"SELECT LastName, FirstName, City FROM Employee;",0,0,"Expected a total of 3 row(s) to be returned, instead got 8!",0,
+"min, max",29,SELECT MIN(UnitPrice) FROM InvoiceLine;,SELECT UnitPrice FROM InvoiceLine LIMIT 1;,0,0,zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik → Test für Verfahren mit pragmatischen Ansatz (result: Expected only the following column(s) to be selected: MIN(UnitPrice)!),0,
+,30,,SELECT MAX(UnitPrice) FROM InvoiceLine;,0,0,Expected only the following column(s) to be selected: MIN(UnitPrice)!,0,
+,31,SELECT MAX(UnitPrice) FROM InvoiceLine;,SELECT UnitPrice FROM InvoiceLine LIMIT 1;,0,0,Expected only the following column(s) to be selected: MAX(UnitPrice)!,0,
+count,32,"SELECT COUNT(UnitPrice) FROM InvoiceLine WHERE UnitPrice = 0.99;
+",SELECT UnitPrice FROM InvoiceLine WHERE UnitPrice = 0.99;,0,0,SELECT UnitPrice FROM InvoiceLine WHERE UnitPrice = 0.99;,0,
+avg,33,"SELECT avg(Total) FROM Invoice;
+",SELECT Total FROM Invoice;,0,0,"Expected a total of 1 row(s) to be returned, instead got 412!",0,
+sum,34,SELECT sum(Total) FROM Invoice;,,0,0,"Expected a total of 1 row(s) to be returned, instead got 412!",0,
+like,35,"SELECT ArtistId, Name FROM Artist WHERE Name LIKE '%Metal%';","SELECT ArtistId, Name FROM Artist;",0,0,"Expected a total of 1 row(s) to be returned, instead got 275!",0,
+,36,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'Sant%';","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'San%';",0,0,"Expected a total of 9 row(s) to be returned, instead got 10!",0,
+,37,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'M%o';
+","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'M%';",0,0,"Expected a total of 3 row(s) to be returned, instead got 20!",0,
+,38,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE '_ %';","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE '_%';",0,0,"Expected a total of 3 row(s) to be returned, instead got 275!",0,
+in,39,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice 
+WHERE BillingCountry IN ('USA', 'Canada', 'Brazil');","SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice;",0,0,"Expected a total of 182 row(s) to be returned, instead got 412!",0,
+,40,,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice 
+WHERE BillingCountry IN ('USA', 'Brazil');",0,0,"Expected a total of 182 row(s) to be returned, instead got 126!",0,
+between,41,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice
+WHERE InvoiceDate between '2012-06-04 00:00:00' AND '2012-07-28 00:00:00';","SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice;",0,0,"Expected a total of 13 row(s) to be returned, instead got 412!",0,
+,42,,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice
+WHERE InvoiceDate between '2012-05-04 00:00:00' AND '2012-07-28 00:00:00';
+",0,0,"Expected a total of 13 row(s) to be returned, instead got 20!",0,
+,43,"SELECT InvoiceId, CustomerId FROM Invoice
+WHERE InvoiceId between 50 AND 100;","SELECT InvoiceId, CustomerId FROM Invoice
+WHERE InvoiceId between 0 AND 120;
+",0,0,"Expected a total of 51 row(s) to be returned, instead got 120!",0,
+column alias,44,SELECT Name AS Genres FROM Genre;,SELECT Name AS Genre FROM Genre;,0,0,Expected only the following column(s) to be selected: Genres!,0,
+union,45,"SELECT City FROM Customer
+UNION 
+SELECT City FROM Employee;",SELECT City FROM Customer;,0,0,"Expected a total of 55 row(s) to be returned, instead got 59!",0,
+,46,,"SELECT City FROM Customer
+UNION 
+SELECT BillingCity FROM Invoice;",0,0,"Expected a total of 55 row(s) to be returned, instead got 53!   (gar kein test auf WELCHE relation???)",0,
+,47,"SELECT City FROM Customer
+UNION ALL
+SELECT City FROM Employee;
+","SELECT City FROM Customer
+UNION 
+SELECT City FROM Employee;
+",0,0,"Expected a total of 67 row(s) to be returned, instead got 55!",0,
+"group by, having",49,"SELECT InvoiceId, CustomerId, count(CustomerId) FROM Invoice GROUP BY CustomerId; ","SELECT InvoiceId, CustomerId, count(CustomerId) FROM Invoice
+GROUP BY InvoiceId;",0,0,"Expected a total of 59 row(s) to be returned, instead got 412!",0,
+,50,"SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId
+having count(CustomerId) < 7;","SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId;",0,0,"Expected a total of 1 row(s) to be returned, instead got 59!",0,
+,51,,"SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId
+having count(CustomerId) > 1;",0,0,"Expected a total of 1 row(s) to be returned, instead got 59!",0,
+exists,52,"SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE EXISTS
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND (Genre.Name = 'Reggae' OR Genre.Name = 'Jazz') );","SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE EXISTS
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND Genre.Name = 'Reggae' OR Genre.Name = 'Jazz');",0,0,"Expected a total of 188 row(s) to be returned, instead got 3503!",0,
+,53,,"SELECT TrackID, Name, GenreID 
+FROM Track;",0,0,"Expected a total of 188 row(s) to be returned, instead got 3503!",0,
+,54,,"SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE GenreID IN
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND (Genre.Name = 'Reggae' OR Genre.Name = 'Jazz') );",1,1,,0,
+"Inner, left, self join",55,"SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON Genre.GenreId = Track.GenreId
+);","SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON  Track.GenreId = Genre.GenreId 
+);",1,error,"Tool gibt zwar Fehlermeldung aus, Ergebnis-Tabelle scheint aber korrekt zu sein!!! → Tool evtl. anfällig für große Joins",1,
+,56,"SELECT Customer.CustomerId, Invoice.InvoiceId
+FROM Customer LEFT JOIN Invoice
+ON Customer.CustomerId = Invoice.InvoiceId","SELECT Customer.CustomerId, Invoice.InvoiceId
+FROM Customer LEFT OUTER JOIN Invoice
+ON Customer.CustomerId = Invoice.InvoiceId",1,1,,0,
+,57,"SELECT A.FirstName AS CustomerName1, B.FirstName AS CustomerName2, A.City
+FROM Customer A, Customer B
+WHERE A.CustomerID != B.CustomerID
+AND A.City = B.City 
+ORDER BY A.City;","SELECT X.FirstName AS CustomerName1, Y.FirstName AS CustomerName2, Y.City
+FROM Customer X, Customer Y
+WHERE Y.CustomerID <> X.CustomerID
+AND X.City = Y.City 
+ORDER BY Y.City;",1,1,,0,
+to much joins,58,"SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name FROM 
+(PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId
+);
+","SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON Genre.GenreId = Track.GenreId
+);
+",0,0,"Expected only the following column(s) to be selected: PlaylistId, TrackId, Name!",0,
+,,,,,,,,%
+,,,,,,Expected != actual: ,6,"10,5"
+,,,,,,error,1,"1,8"

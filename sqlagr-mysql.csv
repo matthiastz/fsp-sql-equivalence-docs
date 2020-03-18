@@ -1,0 +1,331 @@
+,,Hinweise,,,,,,
+,,"Ergebnis (0: nicht äquivalent, 1: äquivalent, (pm=0..1): tw. Äquivalent, error: Fehler → System kann Querys nicht vergleichen)",,,,,,
+,,pm = partial marking (z.B. zu 85% korrekt),,,,,,
+,,"pm, sonst 0 → falls Verfahren partielle Bewertung unterstützt wird pm erwartet, ansonsten nicht äquivalent erwartet",,,,,,
+,,,,,,,,
+,,"Name = SQLAutoGrader, pm = false",,,,tats. = tatsächlich,,
+,,,,,,,,
+,,,,Ergebnis,,,,
+Mutations-Kategorie/SQL-Feature,Nr.,Query (Musterlösung),Test-Query (Kandidat),erwartet,tats.,Anmerkung,Compare,
+columns select vs. Select *,1,SELECT * FROM Album,"SELECT AlbumId, Title, ArtistId FROM Album",1,0,Output comparision → bug?!,1,
+,2,"SELECT AlbumId, Title, ArtistId FROM Album",SELECT * FROM Album,1,0,"Output rowcount
+Row count matched Expected:347 Obtained:347
+
+Output comparision
+Output mismatch by rows",1,
+"where: same semantic, minimal syntax change",3,"SELECT TrackId FROM PlaylistTrack 
+WHERE TrackId < 100","SELECT TrackId FROM PlaylistTrack 
+WHERE TrackId <= 99",1,1,,0,
+Semicolon ;,4,SELECT Name FROM Genre;,SELECT Name FROM Genre,1,error,"(node:6661) UnhandledPromiseRejectionWarning: SyntaxError: Expected "","", ""."", ""AS"", ""GROUP"", ""INNER"", ""JOIN"", ""LEFT"", ""LIMIT"", ""ORDER"", ""UNION"", ""WHERE"", ""`"", WHITE_SPACE, [A-Za-z0-9_], [A-Za-z_], or end of input but "";"" found.
+",1,
+"syntax sql keywords (upper, lower case)",5,SELECT Name FROM MediaType,select Name FrOm MediaType,1,1,,0,
+column count differing,6,"SELECT InvoiceDate, BillingAddress, BillingCity FROM Invoice","SELECT BillingAddress, BillingCity FROM Invoice",0,0,erkennt untersch. Anzahl spalten direkt in SELECT nicht! → code geprüft: mysql.js:108;  irreführende Fehlermeldung,0,
+,7,"SELECT BillingAddress, BillingCity FROM Invoice","SELECT InvoiceDate, BillingAddress, BillingCity FROM Invoice",0,1,tool erkennt untersch. Anzahl Spalten nicht als Fehler,1,
+column ordering,8,,"SELECT BillingCity, BillingAddress  FROM Invoice",0,1,,1,
+order by,9,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId ASC","SELECT TrackId, Name, GenreId from Track ORDER BY GenreId",1,1,,0,
+,10,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId DESC","SELECT TrackId, Name, GenreId from Track",0,1,,1,
+,11,,"SELECT TrackId, Name, GenreId from Track ORDER BY GenreId ASC",0,1,,1,
+Redundanzen,12,"SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2
+","SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2 and MediaTypeId > 1",1,1,,0,
+,13,,"SELECT Name, MediaTypeId FROM Track
+WHERE MediaTypeId > 2 or MediaTypeId > 1
+",0,0,,0,
+Sub-Query/Join,14,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join (select MediaType.MediaTypeId,  MediaType.Name from MediaType where MediaType.Name = 'AAC audio file')
+as t_MediaType ON Track.MediaTypeId = t_MediaType.MediaTypeId","select Track.TrackId, Track.Name, Track.Composer   from Track 
+join (select MediaType.MediaTypeId,  MediaType.Name from MediaType)
+as t_MediaType ON Track.MediaTypeId = t_MediaType.MediaTypeId
+",0,0,"Row count mismatched Expected:11 Obtained:3503
+
+Missing Tables in query: rep_string_1
+
+Extra Tables in query: rep_string_0",0,
+,15,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+Join MediaType ON Track.MediaTypeId = MediaType.MediaTypeId
+
+",0,0,"Output rowcount
+Row count mismatched Expected:11 Obtained:3503
+
+Output comparision
+Output mismatch by 3492 rows
+
+Query Cluase Analysis
+Missing Tables in query: rep_string_1
+
+Extra Tables in query: MediaType",0,
+,16,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join MediaType
+ON Track.MediaTypeId = MediaType.MediaTypeId
+WHERE MediaType.Name = 'AAC audio file'
+
+",1,0,"Query eigentlich korrekt, nur laut Tool fehlen bestimmte Klauseln:       Query Cluase Analysis
+Missing Tables in query: rep_string_1
+
+Extra Tables in query: MediaType
+
+Extra condition on columns: Name",1,
+,17,,"select Track.TrackId, Track.Name, Track.Composer  from Track 
+join MediaType
+ON Track.MediaTypeId = MediaType.MediaTypeId
+AND MediaType.Name = 'AAC audio file'
+
+
+",1,0,"Query Cluase Analysis
+Missing Tables in query: rep_string_1
+
+Extra Tables in query: MediaType",1,
+,18,,"select Track.TrackId, Track.Name, Track.Composer
+from Track, MediaType
+where
+Track.MediaTypeId = MediaType.MediaTypeId
+and 
+(MediaType.Name = 'AAC audio file')",1,0,"Query Cluase Analysis
+Missing Tables in query: rep_string_1
+
+Extra Tables in query: MediaType
+
+Extra condition on columns: MediaTypeId,Name",1,
+distinct,19,SELECT DISTINCT PlaylistId FROM PlaylistTrack,SELECT  PlaylistId FROM PlaylistTrack,0,0,,0,
+"where, and",20,"SELECT * FROM Employee
+WHERE Title = 'Sales Support Agent'",SELECT * FROM Employee,0,0,"Query Output Analysis
+Output rowcount
+Row count mismatched Expected:3 Obtained:8
+
+Output comparision
+Output mismatch by rows
+
+Query Cluase Analysis
+Missing condition on columns: Title",0,
+,21,,"SELECT * FROM Employee
+WHERE ReportsTo = 2
+
+",0,0,"zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik – Query Cluase Analysis
+Missing condition on columns: Title
+
+Extra condition on columns: ReportsTo",0,
+,22,"SELECT Email FROM Employee
+WHERE City = 'Calgary' AND ReportsTo = 1
+","SELECT Email FROM Employee
+WHERE City = 'Calgary'
+",0,0,"Query Output Analysis
+Output rowcount
+Row count mismatched Expected:2 Obtained:5
+
+Output comparision
+Output mismatch by 3 rows
+
+Query Cluase Analysis
+Missing condition on columns: ReportsTo",0,
+or,23,"SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton' OR City  = 'Lethbridge'","SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton'",0,0,"Output rowcount
+Row count mismatched Expected:3 Obtained:1
+
+Output comparision
+Output mismatch by 2 rows",0,
+,24,,"SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Edmonton' OR City = 'Calgary'",0,0,"Output rowcount
+Row count mismatched Expected:3 Obtained:6
+
+Output comparision
+Output mismatch by 7 rows",0,
+not,25,"SELECT LastName, FirstName, City FROM Employee
+WHERE NOT City = 'Calgary'","SELECT LastName, FirstName, City FROM Employee
+WHERE City = 'Lethbridge' OR City = 'Edmonton'",0,1,zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik → Test für Verfahren mit pragmatischen Ansatz,1,
+,26,,"SELECT LastName, FirstName, City FROM Employee
+WHERE NOT City = 'Edmonton'",0,0,"Output rowcount
+Row count mismatched Expected:3 Obtained:7
+
+Output comparision
+Output mismatch by 6 rows",0,
+limit,27,"SELECT LastName, FirstName, City FROM Employee
+LIMIT 3","SELECT LastName, FirstName, City FROM Employee
+LIMIT 4
+",0,0,,0,
+,28,,"SELECT LastName, FirstName, City FROM Employee",0,0,,0,
+"min, max",29,SELECT MIN(UnitPrice) FROM InvoiceLine,SELECT UnitPrice FROM InvoiceLine LIMIT 1,0,0,"zufällig gleiches Ergebnis-Set aber andere Syntax & Semantik – Output rowcount
+Row count matched Expected:1 Obtained:1
+
+Output comparision
+Output mismatch by rows",0,
+,30,,SELECT MAX(UnitPrice) FROM InvoiceLine,0,0,"Query Output Analysis
+Output rowcount
+Row count matched Expected:1 Obtained:1
+
+Output comparision
+Output mismatch by rows",0,
+,31,SELECT MAX(UnitPrice) FROM InvoiceLine,SELECT UnitPrice FROM InvoiceLine LIMIT 1,0,0,"Output rowcount
+Row count matched Expected:1 Obtained:1
+
+Output comparision
+Output mismatch by rows",0,
+count,32,"SELECT COUNT(UnitPrice) FROM InvoiceLine WHERE UnitPrice = 0.99
+",SELECT UnitPrice FROM InvoiceLine WHERE UnitPrice = 0.99,0,0,"Output rowcount
+Row count mismatched Expected:1 Obtained:2129
+
+Output comparision
+Output mismatch by rows",0,
+avg,33,"SELECT avg(Total) FROM Invoice
+",SELECT Total FROM Invoice,0,0,"Output rowcount
+Row count mismatched Expected:1 Obtained:412
+
+Output comparision
+Output mismatch by rows",0,
+sum,34,SELECT sum(Total) FROM Invoice,,0,0,,0,
+like,35,"SELECT ArtistId, Name FROM Artist WHERE Name LIKE '%Metal%'","SELECT ArtistId, Name FROM Artist",0,0,"Output rowcount
+Row count mismatched Expected:1 Obtained:275
+
+Output comparision
+Output mismatch by 274 rows
+
+Query Cluase Analysis
+Missing condition on columns: Name",0,
+,36,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'Sant%'","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'San%'",0,0,row count mismatch ,0,
+,37,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'M%o'
+","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE 'M%'",0,0,row count mismatch ,0,
+,38,"SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE '_ %'","SELECT ArtistId, Name FROM Artist
+WHERE Name LIKE '_%'",0,0,row count mismatch ,0,
+in,39,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice 
+WHERE BillingCountry IN ('USA', 'Canada', 'Brazil')","SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice",0,error,"UnhandledPromiseRejectionWarning: SyntaxError: Expected ""$"", ""("", or WHITE_SPACE but ""r"" found.
+    at peg$buildStructuredError (/home/matthias/DEV/fsp-sqlequi/tools/SQLAutoGrader/node_modules/node-sqlparser/lib/parse.js:999:12)
+",1,
+,40,,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice 
+WHERE BillingCountry IN ('USA', 'Brazil')",0,error,"UnhandledPromiseRejectionWarning: SyntaxError: Expected ""$"", ""("", or WHITE_SPACE but ""r"" found.
+    at peg$buildStructuredError (/home/matthias/DEV/fsp-sqlequi/tools/SQLAutoGrader/node_modules/node-sqlparser/lib/parse.js:999:12)
+",1,
+between,41,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice
+WHERE InvoiceDate between '2012-06-04 00:00:00' AND '2012-07-28 00:00:00'","SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice",0,0,"Output rowcount
+Row count mismatched Expected:13 Obtained:412
+
+Output comparision
+Output mismatch by 399 rows
+
+Query Cluase Analysis
+Missing condition on columns: InvoiceDate,,",0,
+,42,,"SELECT InvoiceId, InvoiceDate, BillingCountry FROM Invoice
+WHERE InvoiceDate between '2012-05-04 00:00:00' AND '2012-07-28 00:00:00'
+",0,0,"Query Output Analysis
+Output rowcount
+Row count mismatched Expected:13 Obtained:20
+
+Output comparision
+Output mismatch by 7 rows
+
+Query Cluase Analysis
+Missing condition on columns: ,
+
+Extra condition on columns: ,",0,
+,43,"SELECT InvoiceId, CustomerId FROM Invoice
+WHERE InvoiceId between 50 AND 100","SELECT InvoiceId, CustomerId FROM Invoice
+WHERE InvoiceId between 0 AND 120
+",0,0,irreführende Fehlermeldung siehe #42,0,
+column alias,44,SELECT Name AS Genres FROM Genre,SELECT Name AS Genre FROM Genre,0,1,Name der Spalte wird nicht berücksichtigt (Alias),1,
+union,45,"SELECT City FROM Customer
+UNION 
+SELECT City FROM Employee",SELECT City FROM Customer,0,0,"Output rowcount
+Row count mismatched Expected:55 Obtained:59
+
+Output comparision
+Output mismatch by 2 rows",0,
+,46,,"SELECT City FROM Customer
+UNION 
+SELECT BillingCity FROM Invoice",0,0,,0,
+,47,"SELECT City FROM Customer
+UNION ALL
+SELECT City FROM Employee
+","SELECT City FROM Customer
+UNION 
+SELECT City FROM Employee
+",0,error,UNION ALL crashes app,1,
+"group by, having",49,"SELECT InvoiceId, CustomerId, count(CustomerId) FROM Invoice GROUP BY CustomerId;","SELECT InvoiceId, CustomerId, count(CustomerId) FROM Invoice
+GROUP BY InvoiceId",0,0,"Output rowcount
+Row count matched Expected:412 Obtained:412
+
+Output comparision
+Output mismatch by rows",0,
+,50,"SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId
+having count(CustomerId) < 7","SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId",0,0,"Query Output Analysis
+Output rowcount
+Row count mismatched Expected:1 Obtained:59
+
+Output comparision
+Output mismatch by rows
+
+Query Cluase Analysis
+Missing condition on columns: CustomerId",0,
+,51,,"SELECT CustomerId, count(CustomerId) FROM Invoice
+group by CustomerId
+having count(CustomerId) > 1",0,0,"Fehlermeldung auch nicht ganz korrekt, Bedingung (having) ist da aber FALSCH:     Output rowcount
+Row count mismatched Expected:1 Obtained:59
+
+Output comparision
+Output mismatch by rows
+
+Query Cluase Analysis
+Missing condition on columns: CustomerId
+
+Extra condition on columns: CustomerId",0,
+exists,52,"SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE EXISTS
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND (Genre.Name = 'Reggae' OR Genre.Name = 'Jazz') )","SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE EXISTS
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND Genre.Name = 'Reggae' OR Genre.Name = 'Jazz')",0,error,"internal tool error:  SyntaxError: Expected ""("" or WHITE_SPACE but ""r"" found.",1,
+,53,,"SELECT TrackID, Name, GenreID 
+FROM Track",0,error,"internal tool error:  SyntaxError: Expected ""("" or WHITE_SPACE but ""r"" found.",1,
+,54,,"SELECT TrackID, Name, GenreID 
+FROM Track
+WHERE GenreID IN
+(SELECT GenreID FROM Genre WHERE Track.GenreId = Genre.GenreId AND (Genre.Name = 'Reggae' OR Genre.Name = 'Jazz') )",1,error," SyntaxError: Expected ""$"", ""("", or WHITE_SPACE but ""r"" found.
+",1,
+"Inner, left, self join",55,"SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON Genre.GenreId = Track.GenreId
+)","SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON  Track.GenreId = Genre.GenreId 
+)",1,error,"Failed to failed to extract SQL clauses due to error in parsing – Failed to compare output due to error in parsing
+
+",1,
+,56,"SELECT Customer.CustomerId, Invoice.InvoiceId
+FROM Customer LEFT JOIN Invoice
+ON Customer.CustomerId = Invoice.InvoiceId","SELECT Customer.CustomerId, Invoice.InvoiceId
+FROM Customer LEFT OUTER JOIN Invoice
+ON Customer.CustomerId = Invoice.InvoiceId",1,error,"SyntaxError: Expected ""JOIN"" or WHITE_SPACE but ""O"" found.
+",1,
+,57,"SELECT A.FirstName AS CustomerName1, B.FirstName AS CustomerName2, A.City
+FROM Customer A, Customer B
+WHERE A.CustomerID != B.CustomerID
+AND A.City = B.City 
+ORDER BY A.City","SELECT X.FirstName AS CustomerName1, Y.FirstName AS CustomerName2, Y.City
+FROM Customer X, Customer Y
+WHERE Y.CustomerID <> X.CustomerID
+AND X.City = Y.City 
+ORDER BY Y.City",1,0,"Eigentlich korrekt, auch Ausgabe, ABER OC ROT: Output comparision
+Output mismatch by 24 rows (bug?!)",1,
+to much joins,58,"SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name FROM 
+(PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId
+)
+","SELECT PlaylistTrack.PlaylistId, Track.TrackId, Track.Name, Genre.Name FROM 
+( (PlaylistTrack INNER JOIN Track ON PlaylistTrack.TrackId = Track.TrackId)
+  INNER join
+  Genre ON Genre.GenreId = Track.GenreId
+)
+",0,error,"Failed to failed to extract SQL clauses due to error in parsing
+
+Hat Problem Kandidat-Q. Zu parsen",1,
+,,,,,,,,%
+,,,,,,Expected != actual: ,22,"38,6"
+,,,,,,error,10,"17,5"
